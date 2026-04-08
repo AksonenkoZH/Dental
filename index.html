@@ -1,0 +1,566 @@
+
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif; }
+.outer { display: flex; justify-content: center; padding: 24px 0 16px; }
+.device { position: relative; width: 300px; }
+.phone-shell { border-radius: 42px; border: 8px solid #1A1F2E; background: #F8FAFB; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,.18); }
+.screen { overflow: hidden; }
+
+.tab-indicator { display: flex; justify-content: center; gap: 8px; margin-top: 12px; }
+.tab-dot { width: 7px; height: 7px; border-radius: 99px; background: #D1D5DB; cursor: pointer; transition: all .2s; }
+.tab-dot.on { background: #0EA5B5; width: 20px; }
+.tab-names { display: flex; justify-content: center; gap: 24px; margin-top: 6px; }
+.tab-name { font-size: 10px; color: #9CA3AF; cursor: pointer; font-family: var(--font-sans); }
+.tab-name.on { color: #0EA5B5; font-weight: 500; }
+
+.screens-wrap { display: flex; transition: transform .35s cubic-bezier(.4,0,.2,1); width: 300%; }
+.s { width: 284px; flex-shrink: 0; }
+
+/* STATUS BAR */
+.sbar { height: 42px; background: #F8FAFB; display: flex; align-items: center; justify-content: space-between; padding: 0 18px; flex-shrink: 0; }
+.sbar-t { font-size: 13px; font-weight: 600; color: #1A1F2E; }
+
+/* SCROLLABLE CONTENT */
+.scr { padding: 0 13px 16px; overflow-y: auto; max-height: 560px; }
+.scr::-webkit-scrollbar { display: none; }
+
+/* SCORE CARD */
+.hcard { border-radius: 18px; padding: 14px; margin-bottom: 11px; transition: background .3s; }
+.hcard.fresh { background: #0EA5B5; }
+.hcard.stale { background: #0C8A99; }
+.hc-lbl { font-size: 9px; color: rgba(255,255,255,.7); text-transform: uppercase; letter-spacing:.06em; }
+.hc-top { display: flex; align-items: flex-start; justify-content: space-between; margin-top: 2px; }
+.hc-num { font-size: 36px; font-weight: 700; color: #fff; letter-spacing: -1px; line-height: 1; }
+.hc-max { font-size: 12px; color: rgba(255,255,255,.5); margin-top: 5px; }
+.hc-chip { border-radius: 99px; padding: 3px 9px; font-size: 9px; font-weight: 500; }
+.hc-bar-bg { height: 3.5px; background: rgba(255,255,255,.25); border-radius: 99px; margin: 9px 0 7px; }
+.hc-bar-fill { height: 3.5px; background: #fff; border-radius: 99px; width: 78%; transition: opacity .3s; }
+.hcs-row { display: flex; }
+.hcs { flex: 1; }
+.hcsv { font-size: 12px; font-weight: 600; color: #fff; }
+.hcsl { font-size: 8px; color: rgba(255,255,255,.6); margin-top: 1px; }
+.hdv { width: .5px; background: rgba(255,255,255,.2); margin: 0 8px; }
+.hc-divider { height: .5px; background: rgba(255,255,255,.2); margin: 10px 0 8px; }
+.scan-btn-inner { border-radius: 11px; padding: 9px 11px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; transition: all .2s; }
+.scan-ic { width: 26px; height: 26px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 12px; flex-shrink: 0; }
+.scan-left { display: flex; align-items: center; gap: 8px; }
+.scan-title { font-size: 11px; font-weight: 600; }
+.scan-sub { font-size: 8.5px; margin-top: 1px; }
+.scan-cta { font-size: 9px; font-weight: 600; padding: 3px 9px; border-radius: 99px; white-space: nowrap; }
+
+/* SECTION HEADERS */
+.sh { display: flex; align-items: center; justify-content: space-between; margin-bottom: 7px; }
+.st { font-size: 12px; font-weight: 600; color: #1A1F2E; }
+.sa { font-size: 10px; color: #0EA5B5; font-weight: 500; cursor: pointer; }
+
+/* TEETH */
+.tw { background: #fff; border-radius: 14px; border: .5px solid #E5E8EC; padding: 9px 5px 7px; margin-bottom: 10px; cursor: pointer; }
+.tw:active { opacity: .85; }
+.leg { display: flex; gap: 6px; justify-content: center; margin-top: 6px; flex-wrap: wrap; }
+.li { display: flex; align-items: center; gap: 2px; font-size: 7px; color: #9CA3AF; }
+.ld { width: 5px; height: 5px; border-radius: 1px; }
+
+/* TREATMENTS BLOCK */
+.tblock { border-radius: 13px; border: .5px solid #E5E8EC; overflow: hidden; }
+.tlabel { font-size: 8px; font-weight: 600; color: #9CA3AF; text-transform: uppercase; letter-spacing:.06em; padding: 8px 11px 4px; background: #fff; }
+.ti { display: flex; align-items: center; gap: 8px; padding: 8px 11px; border-bottom: .5px solid #F8FAFB; background: #fff; cursor: pointer; }
+.ti:active { background: #F8FAFB; }
+.tic { width: 28px; height: 28px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 12px; flex-shrink: 0; }
+.tib { flex: 1; min-width: 0; }
+.tin { font-size: 10.5px; font-weight: 500; color: #1A1F2E; }
+.tis { font-size: 8.5px; color: #9CA3AF; margin-top: 1px; }
+.tpb { height: 2.5px; background: #F3F4F6; border-radius: 99px; margin-top: 4px; }
+.tpf { height: 2.5px; border-radius: 99px; }
+.tbd { font-size: 8.5px; font-weight: 500; padding: 2px 6px; border-radius: 99px; white-space: nowrap; flex-shrink: 0; }
+.rdivider { display: flex; align-items: center; background: #fff; border-top: .5px solid #E5E8EC; border-bottom: .5px solid #E5E8EC; padding: 4px 11px; }
+.rdivider div.line { flex:1; height:.5px; background:#E5E8EC; }
+.rdivider span { font-size: 7.5px; font-weight: 600; color: #C4C9D0; text-transform: uppercase; letter-spacing:.07em; padding: 0 7px; }
+.hi { display: flex; align-items: center; gap: 8px; padding: 7px 11px; border-bottom: .5px solid #F0F1F3; background: #FAFBFC; }
+.hi:last-child { border-bottom: none; }
+.hd { background: #ECEEF2; border-radius: 7px; width: 30px; height: 32px; display: flex; flex-direction: column; align-items: center; justify-content: center; flex-shrink: 0; }
+.hday { font-size: 12px; font-weight: 700; color: #4B5563; line-height: 1; }
+.hmon { font-size: 7px; color: #9CA3AF; text-transform: uppercase; margin-top: 1px; }
+.hbn { font-size: 10px; font-weight: 500; color: #374151; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.hbs { font-size: 8px; color: #9CA3AF; margin-top: 1px; }
+.hchip { font-size: 8px; font-weight: 500; padding: 2px 6px; border-radius: 99px; flex-shrink: 0; }
+.see-all { padding: 8px 11px; background: #FAFBFC; display: flex; align-items: center; justify-content: center; border-top: .5px solid #E5E8EC; cursor: pointer; }
+.see-all span { font-size: 9.5px; color: #0EA5B5; font-weight: 500; }
+
+/* MY TEETH SCREEN */
+.screen-header { display: flex; align-items: center; gap: 8px; padding: 6px 0 12px; }
+.back-btn { width: 30px; height: 30px; border-radius: 99px; background: #F3F4F6; display: flex; align-items: center; justify-content: center; font-size: 14px; color: #6B7280; cursor: pointer; flex-shrink: 0; }
+.screen-title { font-size: 17px; font-weight: 700; color: #1A1F2E; letter-spacing: -0.4px; }
+.jaw-tabs { display: flex; background: #F3F4F6; border-radius: 10px; padding: 3px; margin-bottom: 12px; }
+.jtab { flex: 1; text-align: center; font-size: 10px; font-weight: 500; padding: 5px 0; border-radius: 8px; color: #6B7280; cursor: pointer; transition: all .15s; }
+.jtab.on { background: #fff; color: #1A1F2E; }
+.teeth-detail-card { background: #fff; border-radius: 14px; border: .5px solid #E5E8EC; overflow: hidden; margin-bottom: 10px; }
+.tdc-header { display: flex; align-items: center; gap: 10px; padding: 11px 13px; border-bottom: .5px solid #F3F4F6; }
+.tdc-num { width: 34px; height: 34px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; flex-shrink: 0; }
+.tdc-name { font-size: 12px; font-weight: 600; color: #1A1F2E; }
+.tdc-status { display: inline-flex; align-items: center; gap: 3px; font-size: 9px; padding: 2px 7px; border-radius: 99px; margin-top: 3px; }
+.tdc-doc { font-size: 8.5px; color: #9CA3AF; margin-top: 2px; }
+.pb-wrap { padding: 10px 13px 12px; }
+.pb-lbl { font-size: 9px; color: #9CA3AF; margin-bottom: 5px; }
+.pb-steps { display: flex; gap: 3px; }
+.pb-step { flex: 1; height: 3.5px; border-radius: 99px; }
+.pb-done { background: #0EA5B5; }
+.pb-curr { background: #0EA5B5; opacity: .4; }
+.pb-next { background: #E5E8EC; }
+.pb-names { display: flex; justify-content: space-between; margin-top: 4px; }
+.pb-n { font-size: 7.5px; color: #C4C9D0; }
+.pb-n.on { color: #0EA5B5; font-weight: 500; }
+.tl-wrap { padding: 0 13px 12px; border-top: .5px solid #F3F4F6; }
+.tl-section-lbl { font-size: 9px; font-weight: 600; color: #9CA3AF; text-transform: uppercase; letter-spacing: .06em; padding: 9px 0 6px; }
+.tl-item { display: flex; gap: 9px; padding: 6px 0; }
+.tl-left { display: flex; flex-direction: column; align-items: center; width: 26px; flex-shrink: 0; }
+.tl-dot { width: 9px; height: 9px; border-radius: 99px; flex-shrink: 0; }
+.tl-line { width: 1px; flex: 1; background: #E5E8EC; margin-top: 3px; }
+.tl-date { font-size: 8.5px; color: #9CA3AF; margin-bottom: 2px; }
+.tl-title { font-size: 11px; font-weight: 500; color: #1A1F2E; }
+.tl-sub { font-size: 9px; color: #9CA3AF; margin-top: 1px; line-height: 1.4; }
+
+/* FAMILY SCREEN */
+.fam-card { background: #fff; border-radius: 12px; border: .5px solid #E5E8EC; padding: 10px 12px; margin-bottom: 7px; display: flex; align-items: center; gap: 10px; cursor: pointer; }
+.fam-ava { width: 36px; height: 36px; border-radius: 99px; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; flex-shrink: 0; }
+.fam-name { font-size: 11px; font-weight: 600; color: #1A1F2E; }
+.fam-role { font-size: 8.5px; color: #9CA3AF; margin-top: 1px; }
+.fam-score-wrap { display: flex; flex-direction: column; align-items: flex-end; gap: 3px; margin-left: auto; }
+.fam-score { font-size: 16px; font-weight: 700; letter-spacing: -0.4px; line-height: 1; }
+.fam-bar-bg { width: 44px; height: 3px; background: #F3F4F6; border-radius: 99px; }
+.fam-bar-f { height: 3px; border-radius: 99px; }
+.fam-lbl { font-size: 7.5px; color: #9CA3AF; }
+
+/* PROFILE SCREEN */
+.prof-ava-row { display: flex; align-items: center; gap: 11px; padding: 4px 0 14px; }
+.prof-ava { width: 44px; height: 44px; border-radius: 99px; background: #CFFAFE; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 700; color: #0E7490; flex-shrink: 0; }
+.prof-name { font-size: 15px; font-weight: 600; color: #1A1F2E; }
+.prof-sub { font-size: 9px; color: #9CA3AF; margin-top: 2px; }
+.section-card { background: #fff; border-radius: 12px; border: .5px solid #E5E8EC; overflow: hidden; margin-bottom: 8px; }
+.sc-title { font-size: 9px; font-weight: 600; color: #9CA3AF; text-transform: uppercase; letter-spacing: .06em; padding: 8px 12px 4px; }
+.sc-row { display: flex; align-items: center; gap: 9px; padding: 9px 12px; border-bottom: .5px solid #F3F4F6; cursor: pointer; }
+.sc-row:last-child { border-bottom: none; }
+.sc-ic { width: 28px; height: 28px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 13px; flex-shrink: 0; }
+.sc-bname { font-size: 10.5px; font-weight: 500; color: #1A1F2E; }
+.sc-bsub { font-size: 8.5px; color: #9CA3AF; margin-top: 1px; }
+.sc-badge { font-size: 8px; font-weight: 500; padding: 2px 7px; border-radius: 99px; }
+.sc-arr { font-size: 14px; color: #D1D5DB; margin-left: auto; }
+
+/* NAV */
+.nb { display: flex; background: #fff; border-top: .5px solid #E5E8EC; padding: 8px 0 5px; flex-shrink: 0; }
+.ni { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px; cursor: pointer; }
+.nl { font-size: 7.5px; color: #9CA3AF; transition: color .15s; }
+.nl.on { color: #0EA5B5; }
+.ni-dot { width: 3px; height: 3px; border-radius: 99px; background: #0EA5B5; margin-top: 1px; }
+
+/* SLIDE TRANSITION */
+.page { display: none; }
+.page.active { display: flex; flex-direction: column; height: 100%; }
+</style>
+
+<div class="outer">
+  <div class="device">
+    <div class="phone-shell">
+      <div class="screen">
+
+        <!-- HOME PAGE -->
+        <div class="page active" id="page-home">
+          <div class="sbar">
+            <span class="sbar-t">9:41</span>
+            <div style="display:flex;gap:3px;align-items:center;">
+              <svg width="14" height="9" viewBox="0 0 14 9" fill="#1A1F2E" opacity=".5"><rect x="0" y="3" width="2.5" height="6" rx=".8"/><rect x="3.8" y="2" width="2.5" height="7" rx=".8"/><rect x="7.5" y="1" width="2.5" height="8" rx=".8"/><rect x="11.2" y="0" width="2.5" height="9" rx=".8"/></svg>
+              <div style="width:20px;height:9px;border-radius:2.5px;border:1px solid rgba(26,31,46,.3);"><div style="margin:1px;width:14px;height:5px;background:#1A1F2E;border-radius:1px;opacity:.55;"></div></div>
+            </div>
+          </div>
+          <div class="scr">
+
+            <div class="hcard fresh" id="score-card">
+              <div class="hc-lbl">Dental health score</div>
+              <div class="hc-top">
+                <div style="display:flex;align-items:baseline;gap:3px;"><div class="hc-num">78</div><div class="hc-max">/100</div></div>
+                <div class="hc-chip" id="score-chip" style="background:rgba(255,255,255,.2);color:#fff;">+4 this week</div>
+              </div>
+              <div class="hc-bar-bg"><div class="hc-bar-fill" id="score-bar"></div></div>
+              <div class="hcs-row">
+                <div class="hcs"><div class="hcsv">🔥 14</div><div class="hcsl">day streak</div></div>
+                <div class="hdv"></div>
+                <div class="hcs"><div class="hcsv">26/32</div><div class="hcsl">healthy</div></div>
+                <div class="hdv"></div>
+                <div class="hcs"><div class="hcsv">Apr 12</div><div class="hcsl">next visit</div></div>
+              </div>
+              <div class="hc-divider"></div>
+              <div class="scan-btn-inner" id="scan-btn" style="background:rgba(255,255,255,.95);" onclick="goToScan()">
+                <div class="scan-left">
+                  <div class="scan-ic" id="scan-ic" style="background:#0EA5B5;">🤖</div>
+                  <div>
+                    <div class="scan-title" id="scan-title" style="color:#0C7A87;">AI scan · 82/100</div>
+                    <div class="scan-sub" id="scan-sub" style="color:#5BA8B0;">2 days ago · Looking good</div>
+                  </div>
+                </div>
+                <div class="scan-cta" id="scan-cta" style="color:#0EA5B5;background:#E0F9F9;">Scan again</div>
+              </div>
+            </div>
+
+            <div class="sh"><div class="st">My teeth</div><div class="sa" onclick="goToTeeth()">View all →</div></div>
+            <div class="tw" onclick="goToTeeth()">
+              <svg width="100%" viewBox="0 0 250 108" xmlns="http://www.w3.org/2000/svg" style="display:block;">
+                <text x="125" y="7" text-anchor="middle" font-size="5.5" fill="#9CA3AF" font-family="sans-serif" letter-spacing="0.5">UPPER JAW</text>
+                <g opacity="0.4"><rect x="3" y="10" width="11" height="12" rx="2.5" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="0.5"/><rect x="4" y="22" width="9" height="16" rx="1.5" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="0.5"/><line x1="6" y1="12" x2="12" y2="18" stroke="#D1D5DB" stroke-width="0.6"/><line x1="12" y1="12" x2="6" y2="18" stroke="#D1D5DB" stroke-width="0.6"/></g>
+                <g><rect x="16" y="9" width="12" height="13" rx="2.5" fill="#F0FDF4" stroke="#6EE7B7" stroke-width="0.7"/><rect x="17" y="22" width="10" height="17" rx="1.5" fill="#F0FDF4" stroke="#6EE7B7" stroke-width="0.7"/><line x1="22" y1="11" x2="22" y2="22" stroke="#A7F3D0" stroke-width="0.5"/><line x1="17" y1="15.5" x2="28" y2="15.5" stroke="#A7F3D0" stroke-width="0.5"/></g>
+                <g><rect x="30" y="9" width="12" height="13" rx="2.5" fill="#F0FDF4" stroke="#6EE7B7" stroke-width="0.7"/><rect x="31" y="22" width="10" height="17" rx="1.5" fill="#F0FDF4" stroke="#6EE7B7" stroke-width="0.7"/><line x1="36" y1="11" x2="36" y2="22" stroke="#A7F3D0" stroke-width="0.5"/><line x1="31" y1="15.5" x2="42" y2="15.5" stroke="#A7F3D0" stroke-width="0.5"/></g>
+                <g><rect x="44" y="10" width="10" height="11" rx="2" fill="#FEFCE8" stroke="#FCD34D" stroke-width="0.8"/><rect x="45" y="21" width="8" height="20" rx="1.5" fill="#FEFCE8" stroke="#FCD34D" stroke-width="0.8"/></g>
+                <g><rect x="56" y="10" width="10" height="11" rx="2" fill="#EFF6FF" stroke="#93C5FD" stroke-width="0.8"/><rect x="57" y="21" width="8" height="20" rx="1.5" fill="#EFF6FF" stroke="#93C5FD" stroke-width="0.8"/></g>
+                <g><path d="M73 10 Q76 9 79 10 L78 21 Q76 23 74 21 Z" fill="#F0FDF4" stroke="#6EE7B7" stroke-width="0.7"/><rect x="74" y="21" width="4" height="21" rx="1.5" fill="#F0FDF4" stroke="#6EE7B7" stroke-width="0.7"/></g>
+                <g><rect x="81" y="11" width="8" height="10" rx="2.5" fill="#F0FDF4" stroke="#6EE7B7" stroke-width="0.7"/><rect x="82" y="21" width="6" height="21" rx="1.5" fill="#F0FDF4" stroke="#6EE7B7" stroke-width="0.7"/></g>
+                <g><rect x="91" y="10" width="10" height="11" rx="2.5" fill="#FEF2F2" stroke="#FCA5A5" stroke-width="1.1"/><rect x="92" y="21" width="8" height="22" rx="1.5" fill="#FEF2F2" stroke="#FCA5A5" stroke-width="1.1"/><rect x="89" y="8" width="14" height="37" rx="3.5" fill="none" stroke="#EF4444" stroke-width="1.2" stroke-dasharray="2,1.5" opacity="0.8"/></g>
+                <line x1="121" y1="8" x2="121" y2="48" stroke="#E5E7EB" stroke-width="0.5" stroke-dasharray="1.5,1.5"/>
+                <g><rect x="111" y="10" width="10" height="11" rx="2.5" fill="#F0FDF4" stroke="#6EE7B7" stroke-width="0.7"/><rect x="112" y="21" width="8" height="22" rx="1.5" fill="#F0FDF4" stroke="#6EE7B7" stroke-width="0.7"/></g>
+                <g><rect x="123" y="11" width="8" height="10" rx="2.5" fill="#F0FDF4" stroke="#6EE7B7" stroke-width="0.7"/><rect x="124" y="21" width="6" height="21" rx="1.5" fill="#F0FDF4" stroke="#6EE7B7" stroke-width="0.7"/></g>
+                <g><path d="M133 10 Q136 9 139 10 L138 21 Q136 23 134 21 Z" fill="#F0FDF4" stroke="#6EE7B7" stroke-width="0.7"/><rect x="134" y="21" width="4" height="21" rx="1.5" fill="#F0FDF4" stroke="#6EE7B7" stroke-width="0.7"/></g>
+                <g><rect x="140" y="10" width="10" height="11" rx="2" fill="#F0FDF4" stroke="#6EE7B7" stroke-width="0.7"/><rect x="141" y="21" width="8" height="20" rx="1.5" fill="#F0FDF4" stroke="#6EE7B7" stroke-width="0.7"/></g>
+                <g><rect x="152" y="10" width="10" height="11" rx="2" fill="#F0FDF4" stroke="#6EE7B7" stroke-width="0.7"/><rect x="153" y="21" width="8" height="20" rx="1.5" fill="#F0FDF4" stroke="#6EE7B7" stroke-width="0.7"/></g>
+                <g><rect x="164" y="9" width="12" height="13" rx="2.5" fill="#F0FDF4" stroke="#6EE7B7" stroke-width="0.7"/><rect x="165" y="22" width="10" height="17" rx="1.5" fill="#F0FDF4" stroke="#6EE7B7" stroke-width="0.7"/><line x1="170" y1="11" x2="170" y2="22" stroke="#A7F3D0" stroke-width="0.5"/><line x1="165" y1="15.5" x2="176" y2="15.5" stroke="#A7F3D0" stroke-width="0.5"/></g>
+                <g><rect x="178" y="9" width="12" height="13" rx="2.5" fill="#F0FDF4" stroke="#6EE7B7" stroke-width="0.7"/><rect x="179" y="22" width="10" height="17" rx="1.5" fill="#F0FDF4" stroke="#6EE7B7" stroke-width="0.7"/><line x1="184" y1="11" x2="184" y2="22" stroke="#A7F3D0" stroke-width="0.5"/><line x1="179" y1="15.5" x2="190" y2="15.5" stroke="#A7F3D0" stroke-width="0.5"/></g>
+                <g opacity="0.4"><rect x="192" y="10" width="11" height="12" rx="2.5" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="0.5"/><rect x="193" y="22" width="9" height="16" rx="1.5" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="0.5"/><line x1="195" y1="12" x2="201" y2="18" stroke="#D1D5DB" stroke-width="0.6"/><line x1="201" y1="12" x2="195" y2="18" stroke="#D1D5DB" stroke-width="0.6"/></g>
+                <line x1="3" y1="52" x2="203" y2="52" stroke="#E5E7EB" stroke-width="0.5"/>
+                <text x="103" y="59" text-anchor="middle" font-size="5.5" fill="#9CA3AF" font-family="sans-serif" letter-spacing="0.5">LOWER JAW</text>
+                <g opacity="0.4"><rect x="3" y="62" width="11" height="16" rx="1.5" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="0.5"/><rect x="4" y="78" width="9" height="11" rx="2.5" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="0.5"/><line x1="6" y1="83" x2="12" y2="89" stroke="#D1D5DB" stroke-width="0.6"/><line x1="12" y1="83" x2="6" y2="89" stroke="#D1D5DB" stroke-width="0.6"/></g>
+                <g><rect x="16" y="62" width="10" height="17" rx="1.5" fill="#F0FDF4" stroke="#6EE7B7" stroke-width="0.7"/><rect x="17" y="79" width="8" height="13" rx="2.5" fill="#F0FDF4" stroke="#6EE7B7" stroke-width="0.7"/><line x1="21" y1="79" x2="21" y2="92" stroke="#A7F3D0" stroke-width="0.5"/><line x1="17" y1="84" x2="27" y2="84" stroke="#A7F3D0" stroke-width="0.5"/></g>
+                <g><rect x="30" y="62" width="10" height="17" rx="1.5" fill="#F0FDF4" stroke="#6EE7B7" stroke-width="0.7"/><rect x="31" y="79" width="8" height="13" rx="2.5" fill="#F0FDF4" stroke="#6EE7B7" stroke-width="0.7"/><line x1="35" y1="79" x2="35" y2="92" stroke="#A7F3D0" stroke-width="0.5"/><line x1="31" y1="84" x2="41" y2="84" stroke="#A7F3D0" stroke-width="0.5"/></g>
+                <g><rect x="44" y="63" width="8" height="20" rx="1.5" fill="#F0FDF4" stroke="#6EE7B7" stroke-width="0.7"/><rect x="44" y="83" width="8" height="10" rx="2" fill="#F0FDF4" stroke="#6EE7B7" stroke-width="0.7"/></g>
+                <g><rect x="55" y="63" width="8" height="20" rx="1.5" fill="#F5F3FF" stroke="#C4B5FD" stroke-width="0.8"/><rect x="55" y="83" width="8" height="10" rx="2" fill="#F5F3FF" stroke="#C4B5FD" stroke-width="0.8"/><line x1="59" y1="66" x2="59" y2="78" stroke="#C4B5FD" stroke-width="1" stroke-dasharray="1.5,1"/></g>
+                <g><rect x="66" y="61" width="5" height="25" rx="1.5" fill="#F0FDF4" stroke="#6EE7B7" stroke-width="0.7"/><path d="M64 86 Q68.5 84 73 86 L72 93 Q68.5 95 65 93 Z" fill="#F0FDF4" stroke="#6EE7B7" stroke-width="0.7"/></g>
+                <g><rect x="75" y="63" width="6" height="21" rx="1.5" fill="#F0FDF4" stroke="#6EE7B7" stroke-width="0.7"/><rect x="75" y="84" width="6" height="9" rx="2" fill="#F0FDF4" stroke="#6EE7B7" stroke-width="0.7"/></g>
+                <g><rect x="84" y="62" width="8" height="22" rx="1.5" fill="#F0FDF4" stroke="#6EE7B7" stroke-width="0.7"/><rect x="84" y="84" width="8" height="9" rx="2" fill="#F0FDF4" stroke="#6EE7B7" stroke-width="0.7"/></g>
+                <line x1="104" y1="56" x2="104" y2="106" stroke="#E5E7EB" stroke-width="0.5" stroke-dasharray="1.5,1.5"/>
+                <g><rect x="96" y="62" width="8" height="22" rx="1.5" fill="#F0FDF4" stroke="#6EE7B7" stroke-width="0.7"/><rect x="96" y="84" width="8" height="9" rx="2" fill="#F0FDF4" stroke="#6EE7B7" stroke-width="0.7"/></g>
+                <g><rect x="107" y="63" width="6" height="21" rx="1.5" fill="#F0FDF4" stroke="#6EE7B7" stroke-width="0.7"/><rect x="107" y="84" width="6" height="9" rx="2" fill="#F0FDF4" stroke="#6EE7B7" stroke-width="0.7"/></g>
+                <g><rect x="116" y="61" width="5" height="25" rx="1.5" fill="#FEFCE8" stroke="#FCD34D" stroke-width="0.8"/><path d="M114 86 Q118.5 84 123 86 L122 93 Q118.5 95 115 93 Z" fill="#FEFCE8" stroke="#FCD34D" stroke-width="0.8"/></g>
+                <g><rect x="125" y="63" width="8" height="20" rx="1.5" fill="#F0FDF4" stroke="#6EE7B7" stroke-width="0.7"/><rect x="125" y="83" width="8" height="10" rx="2" fill="#F0FDF4" stroke="#6EE7B7" stroke-width="0.7"/></g>
+                <g><rect x="136" y="63" width="8" height="20" rx="1.5" fill="#F0FDF4" stroke="#6EE7B7" stroke-width="0.7"/><rect x="136" y="83" width="8" height="10" rx="2" fill="#F0FDF4" stroke="#6EE7B7" stroke-width="0.7"/></g>
+                <g><rect x="147" y="62" width="10" height="17" rx="1.5" fill="#F0FDF4" stroke="#6EE7B7" stroke-width="0.7"/><rect x="148" y="79" width="8" height="13" rx="2.5" fill="#F0FDF4" stroke="#6EE7B7" stroke-width="0.7"/><line x1="152" y1="79" x2="152" y2="92" stroke="#A7F3D0" stroke-width="0.5"/><line x1="148" y1="84" x2="158" y2="84" stroke="#A7F3D0" stroke-width="0.5"/></g>
+                <g><rect x="160" y="62" width="10" height="17" rx="1.5" fill="#F0FDF4" stroke="#6EE7B7" stroke-width="0.7"/><rect x="161" y="79" width="8" height="13" rx="2.5" fill="#F0FDF4" stroke="#6EE7B7" stroke-width="0.7"/><line x1="165" y1="79" x2="165" y2="92" stroke="#A7F3D0" stroke-width="0.5"/><line x1="161" y1="84" x2="171" y2="84" stroke="#A7F3D0" stroke-width="0.5"/></g>
+                <g opacity="0.4"><rect x="174" y="62" width="11" height="16" rx="1.5" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="0.5"/><rect x="175" y="78" width="9" height="11" rx="2.5" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="0.5"/><line x1="177" y1="83" x2="183" y2="89" stroke="#D1D5DB" stroke-width="0.6"/><line x1="183" y1="83" x2="177" y2="89" stroke="#D1D5DB" stroke-width="0.6"/></g>
+              </svg>
+              <div class="leg">
+                <div class="li"><div class="ld" style="background:#DCFCE7;border:.5px solid #6EE7B7;"></div>Healthy</div>
+                <div class="li"><div class="ld" style="background:#FEF9C3;border:.5px solid #FCD34D;"></div>Watch</div>
+                <div class="li"><div class="ld" style="background:#FEE2E2;border:.5px solid #FCA5A5;"></div>Problem</div>
+                <div class="li"><div class="ld" style="background:#EFF6FF;border:.5px solid #93C5FD;"></div>Treated</div>
+                <div class="li"><div class="ld" style="background:#F5F3FF;border:.5px solid #C4B5FD;"></div>Implant</div>
+              </div>
+            </div>
+
+            <div class="sh"><div class="st">Treatments & history</div></div>
+            <div class="tblock">
+              <div class="tlabel">Active</div>
+              <div class="ti" onclick="goToTeeth()">
+                <div class="tic" style="background:#FEF2F2;">🦷</div>
+                <div class="tib"><div class="tin">Root canal — tooth 11</div><div class="tis">Step 3 of 5 · Dr. Kovalenko</div><div class="tpb"><div class="tpf" style="width:60%;background:#0EA5B5;"></div></div></div>
+                <div class="tbd" style="background:#F0FDFA;color:#0C7A87;">60%</div>
+              </div>
+              <div class="ti">
+                <div class="tic" style="background:#FFF7ED;">📐</div>
+                <div class="tib"><div class="tin">Aligners — 14 of 32</div><div class="tis">Change in 8 days · Dr. Melnyk</div><div class="tpb"><div class="tpf" style="width:44%;background:#F59E0B;"></div></div></div>
+                <div class="tbd" style="background:#FFF7ED;color:#B45309;">44%</div>
+              </div>
+              <div class="rdivider"><div class="line"></div><span>Recent</span><div class="line"></div></div>
+              <div class="hi"><div class="hd"><div class="hday">3</div><div class="hmon">Mar</div></div><div style="flex:1;min-width:0;"><div class="hbn">Canal filling — tooth 11</div><div class="hbs">Dr. Kovalenko</div></div><div class="hchip" style="background:#F0FDFA;color:#0C7A87;">Done</div></div>
+              <div class="hi"><div class="hd"><div class="hday">18</div><div class="hmon">Feb</div></div><div style="flex:1;min-width:0;"><div class="hbn">Canal cleaning — tooth 11</div><div class="hbs">Dr. Kovalenko · 2 photos</div></div><div class="hchip" style="background:#F0FDFA;color:#0C7A87;">Done</div></div>
+              <div class="see-all"><span>See full history →</span></div>
+            </div>
+          </div>
+
+          <div class="nb">
+            <div class="ni" onclick="goToFamily()"><svg width="15" height="15" viewBox="0 0 16 16" fill="none"><circle cx="5.5" cy="5" r="2.2" stroke="#C4C9D0" stroke-width="1.2"/><circle cx="11" cy="5.5" r="1.8" stroke="#C4C9D0" stroke-width="1.2"/><path d="M1.5 13c0-2 1.8-3.5 4-3.5s4 1.5 4 3.5" stroke="#C4C9D0" stroke-width="1.2" stroke-linecap="round"/><path d="M11 10c1.5.3 2.8 1.5 2.8 3" stroke="#C4C9D0" stroke-width="1.2" stroke-linecap="round"/></svg><div class="nl">Family</div></div>
+            <div class="ni"><svg width="15" height="15" viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="5" height="5" rx="1.5" fill="#0EA5B5"/><rect x="9" y="2" width="5" height="5" rx="1.5" fill="#0EA5B5" opacity=".35"/><rect x="2" y="9" width="5" height="5" rx="1.5" fill="#0EA5B5" opacity=".35"/><rect x="9" y="9" width="5" height="5" rx="1.5" fill="#0EA5B5" opacity=".35"/></svg><div class="nl on">Home</div><div class="ni-dot"></div></div>
+            <div class="ni" onclick="goToProfile()"><svg width="15" height="15" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="6" r="2.8" stroke="#C4C9D0" stroke-width="1.2"/><path d="M2.5 14c0-3 2.5-5 5.5-5s5.5 2 5.5 5" stroke="#C4C9D0" stroke-width="1.2" stroke-linecap="round"/></svg><div class="nl">Profile</div></div>
+          </div>
+        </div>
+
+        <!-- MY TEETH PAGE -->
+        <div class="page" id="page-teeth">
+          <div class="sbar"><span class="sbar-t">9:41</span></div>
+          <div class="scr">
+            <div class="screen-header">
+              <div class="back-btn" onclick="goBack()">‹</div>
+              <div class="screen-title">My teeth</div>
+              <div style="margin-left:auto;font-size:9px;background:#F0FDFA;color:#0C7A87;padding:3px 9px;border-radius:99px;font-weight:500;">26 healthy</div>
+            </div>
+            <div class="jaw-tabs">
+              <div class="jtab on">Both jaws</div>
+              <div class="jtab">Upper</div>
+              <div class="jtab">Lower</div>
+            </div>
+            <div class="tw" style="margin-bottom:12px;cursor:default;">
+              <svg width="100%" viewBox="0 0 250 118" xmlns="http://www.w3.org/2000/svg" style="display:block;">
+                <text x="125" y="7" text-anchor="middle" font-size="5.5" fill="#9CA3AF" font-family="sans-serif" letter-spacing="0.5">UPPER JAW</text>
+                <g opacity="0.4"><rect x="3" y="10" width="11" height="12" rx="2.5" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="0.5"/><rect x="4" y="22" width="9" height="16" rx="1.5" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="0.5"/><line x1="6" y1="12" x2="12" y2="18" stroke="#D1D5DB" stroke-width="0.6"/><line x1="12" y1="12" x2="6" y2="18" stroke="#D1D5DB" stroke-width="0.6"/></g>
+                <g><rect x="16" y="9" width="12" height="13" rx="2.5" fill="#F0FDF4" stroke="#6EE7B7" stroke-width="0.7"/><rect x="17" y="22" width="10" height="17" rx="1.5" fill="#F0FDF4" stroke="#6EE7B7" stroke-width="0.7"/><line x1="22" y1="11" x2="22" y2="22" stroke="#A7F3D0" stroke-width="0.5"/><line x1="17" y1="15.5" x2="28" y2="15.5" stroke="#A7F3D0" stroke-width="0.5"/></g>
+                <g><rect x="30" y="9" width="12" height="13" rx="2.5" fill="#F0FDF4" stroke="#6EE7B7" stroke-width="0.7"/><rect x="31" y="22" width="10" height="17" rx="1.5" fill="#F0FDF4" stroke="#6EE7B7" stroke-width="0.7"/><line x1="36" y1="11" x2="36" y2="22" stroke="#A7F3D0" stroke-width="0.5"/><line x1="31" y1="15.5" x2="42" y2="15.5" stroke="#A7F3D0" stroke-width="0.5"/></g>
+                <g><rect x="44" y="10" width="10" height="11" rx="2" fill="#FEFCE8" stroke="#FCD34D" stroke-width="0.8"/><rect x="45" y="21" width="8" height="20" rx="1.5" fill="#FEFCE8" stroke="#FCD34D" stroke-width="0.8"/></g>
+                <g><rect x="56" y="10" width="10" height="11" rx="2" fill="#EFF6FF" stroke="#93C5FD" stroke-width="0.8"/><rect x="57" y="21" width="8" height="20" rx="1.5" fill="#EFF6FF" stroke="#93C5FD" stroke-width="0.8"/></g>
+                <g><path d="M73 10 Q76 9 79 10 L78 21 Q76 23 74 21 Z" fill="#F0FDF4" stroke="#6EE7B7" stroke-width="0.7"/><rect x="74" y="21" width="4" height="21" rx="1.5" fill="#F0FDF4" stroke="#6EE7B7" stroke-width="0.7"/></g>
+                <g><rect x="81" y="11" width="8" height="10" rx="2.5" fill="#F0FDF4" stroke="#6EE7B7" stroke-width="0.7"/><rect x="82" y="21" width="6" height="21" rx="1.5" fill="#F0FDF4" stroke="#6EE7B7" stroke-width="0.7"/></g>
+                <g><rect x="91" y="10" width="10" height="11" rx="2.5" fill="#FEF2F2" stroke="#FCA5A5" stroke-width="1.1"/><rect x="92" y="21" width="8" height="22" rx="1.5" fill="#FEF2F2" stroke="#FCA5A5" stroke-width="1.1"/><rect x="89" y="8" width="14" height="37" rx="3.5" fill="none" stroke="#EF4444" stroke-width="1.2" stroke-dasharray="2,1.5" opacity="0.8"/></g>
+                <line x1="121" y1="8" x2="121" y2="48" stroke="#E5E7EB" stroke-width="0.5" stroke-dasharray="1.5,1.5"/>
+                <g><rect x="111" y="10" width="10" height="11" rx="2.5" fill="#F0FDF4" stroke="#6EE7B7" stroke-width="0.7"/><rect x="112" y="21" width="8" height="22" rx="1.5" fill="#F0FDF4" stroke="#6EE7B7" stroke-width="0.7"/></g>
+                <g><rect x="123" y="11" width="8" height="10" rx="2.5" fill="#F0FDF4" stroke="#6EE7B7" stroke-width="0.7"/><rect x="124" y="21" width="6" height="21" rx="1.5" fill="#F0FDF4" stroke="#6EE7B7" stroke-width="0.7"/></g>
+                <g><path d="M133 10 Q136 9 139 10 L138 21 Q136 23 134 21 Z" fill="#F0FDF4" stroke="#6EE7B7" stroke-width="0.7"/><rect x="134" y="21" width="4" height="21" rx="1.5" fill="#F0FDF4" stroke="#6EE7B7" stroke-width="0.7"/></g>
+                <g><rect x="140" y="10" width="10" height="11" rx="2" fill="#F0FDF4" stroke="#6EE7B7" stroke-width="0.7"/><rect x="141" y="21" width="8" height="20" rx="1.5" fill="#F0FDF4" stroke="#6EE7B7" stroke-width="0.7"/></g>
+                <g><rect x="152" y="10" width="10" height="11" rx="2" fill="#F0FDF4" stroke="#6EE7B7" stroke-width="0.7"/><rect x="153" y="21" width="8" height="20" rx="1.5" fill="#F0FDF4" stroke="#6EE7B7" stroke-width="0.7"/></g>
+                <g><rect x="164" y="9" width="12" height="13" rx="2.5" fill="#F0FDF4" stroke="#6EE7B7" stroke-width="0.7"/><rect x="165" y="22" width="10" height="17" rx="1.5" fill="#F0FDF4" stroke="#6EE7B7" stroke-width="0.7"/><line x1="170" y1="11" x2="170" y2="22" stroke="#A7F3D0" stroke-width="0.5"/><line x1="165" y1="15.5" x2="176" y2="15.5" stroke="#A7F3D0" stroke-width="0.5"/></g>
+                <g><rect x="178" y="9" width="12" height="13" rx="2.5" fill="#F0FDF4" stroke="#6EE7B7" stroke-width="0.7"/><rect x="179" y="22" width="10" height="17" rx="1.5" fill="#F0FDF4" stroke="#6EE7B7" stroke-width="0.7"/><line x1="184" y1="11" x2="184" y2="22" stroke="#A7F3D0" stroke-width="0.5"/><line x1="179" y1="15.5" x2="190" y2="15.5" stroke="#A7F3D0" stroke-width="0.5"/></g>
+                <g opacity="0.4"><rect x="192" y="10" width="11" height="12" rx="2.5" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="0.5"/><rect x="193" y="22" width="9" height="16" rx="1.5" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="0.5"/><line x1="195" y1="12" x2="201" y2="18" stroke="#D1D5DB" stroke-width="0.6"/><line x1="201" y1="12" x2="195" y2="18" stroke="#D1D5DB" stroke-width="0.6"/></g>
+                <line x1="3" y1="52" x2="203" y2="52" stroke="#E5E7EB" stroke-width="0.5"/>
+                <text x="103" y="59" text-anchor="middle" font-size="5.5" fill="#9CA3AF" font-family="sans-serif" letter-spacing="0.5">LOWER JAW</text>
+                <g opacity="0.4"><rect x="3" y="62" width="11" height="16" rx="1.5" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="0.5"/><rect x="4" y="78" width="9" height="11" rx="2.5" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="0.5"/><line x1="6" y1="83" x2="12" y2="89" stroke="#D1D5DB" stroke-width="0.6"/><line x1="12" y1="83" x2="6" y2="89" stroke="#D1D5DB" stroke-width="0.6"/></g>
+                <g><rect x="16" y="62" width="10" height="17" rx="1.5" fill="#F0FDF4" stroke="#6EE7B7" stroke-width="0.7"/><rect x="17" y="79" width="8" height="13" rx="2.5" fill="#F0FDF4" stroke="#6EE7B7" stroke-width="0.7"/><line x1="21" y1="79" x2="21" y2="92" stroke="#A7F3D0" stroke-width="0.5"/><line x1="17" y1="84" x2="27" y2="84" stroke="#A7F3D0" stroke-width="0.5"/></g>
+                <g><rect x="30" y="62" width="10" height="17" rx="1.5" fill="#F0FDF4" stroke="#6EE7B7" stroke-width="0.7"/><rect x="31" y="79" width="8" height="13" rx="2.5" fill="#F0FDF4" stroke="#6EE7B7" stroke-width="0.7"/><line x1="35" y1="79" x2="35" y2="92" stroke="#A7F3D0" stroke-width="0.5"/><line x1="31" y1="84" x2="41" y2="84" stroke="#A7F3D0" stroke-width="0.5"/></g>
+                <g><rect x="44" y="63" width="8" height="20" rx="1.5" fill="#F0FDF4" stroke="#6EE7B7" stroke-width="0.7"/><rect x="44" y="83" width="8" height="10" rx="2" fill="#F0FDF4" stroke="#6EE7B7" stroke-width="0.7"/></g>
+                <g><rect x="55" y="63" width="8" height="20" rx="1.5" fill="#F5F3FF" stroke="#C4B5FD" stroke-width="0.8"/><rect x="55" y="83" width="8" height="10" rx="2" fill="#F5F3FF" stroke="#C4B5FD" stroke-width="0.8"/><line x1="59" y1="66" x2="59" y2="78" stroke="#C4B5FD" stroke-width="1" stroke-dasharray="1.5,1"/></g>
+                <g><rect x="66" y="61" width="5" height="25" rx="1.5" fill="#F0FDF4" stroke="#6EE7B7" stroke-width="0.7"/><path d="M64 86 Q68.5 84 73 86 L72 93 Q68.5 95 65 93 Z" fill="#F0FDF4" stroke="#6EE7B7" stroke-width="0.7"/></g>
+                <g><rect x="75" y="63" width="6" height="21" rx="1.5" fill="#F0FDF4" stroke="#6EE7B7" stroke-width="0.7"/><rect x="75" y="84" width="6" height="9" rx="2" fill="#F0FDF4" stroke="#6EE7B7" stroke-width="0.7"/></g>
+                <g><rect x="84" y="62" width="8" height="22" rx="1.5" fill="#F0FDF4" stroke="#6EE7B7" stroke-width="0.7"/><rect x="84" y="84" width="8" height="9" rx="2" fill="#F0FDF4" stroke="#6EE7B7" stroke-width="0.7"/></g>
+                <line x1="104" y1="56" x2="104" y2="106" stroke="#E5E7EB" stroke-width="0.5" stroke-dasharray="1.5,1.5"/>
+                <g><rect x="96" y="62" width="8" height="22" rx="1.5" fill="#F0FDF4" stroke="#6EE7B7" stroke-width="0.7"/><rect x="96" y="84" width="8" height="9" rx="2" fill="#F0FDF4" stroke="#6EE7B7" stroke-width="0.7"/></g>
+                <g><rect x="107" y="63" width="6" height="21" rx="1.5" fill="#F0FDF4" stroke="#6EE7B7" stroke-width="0.7"/><rect x="107" y="84" width="6" height="9" rx="2" fill="#F0FDF4" stroke="#6EE7B7" stroke-width="0.7"/></g>
+                <g><rect x="116" y="61" width="5" height="25" rx="1.5" fill="#FEFCE8" stroke="#FCD34D" stroke-width="0.8"/><path d="M114 86 Q118.5 84 123 86 L122 93 Q118.5 95 115 93 Z" fill="#FEFCE8" stroke="#FCD34D" stroke-width="0.8"/></g>
+                <g><rect x="125" y="63" width="8" height="20" rx="1.5" fill="#F0FDF4" stroke="#6EE7B7" stroke-width="0.7"/><rect x="125" y="83" width="8" height="10" rx="2" fill="#F0FDF4" stroke="#6EE7B7" stroke-width="0.7"/></g>
+                <g><rect x="136" y="63" width="8" height="20" rx="1.5" fill="#F0FDF4" stroke="#6EE7B7" stroke-width="0.7"/><rect x="136" y="83" width="8" height="10" rx="2" fill="#F0FDF4" stroke="#6EE7B7" stroke-width="0.7"/></g>
+                <g><rect x="147" y="62" width="10" height="17" rx="1.5" fill="#F0FDF4" stroke="#6EE7B7" stroke-width="0.7"/><rect x="148" y="79" width="8" height="13" rx="2.5" fill="#F0FDF4" stroke="#6EE7B7" stroke-width="0.7"/><line x1="152" y1="79" x2="152" y2="92" stroke="#A7F3D0" stroke-width="0.5"/><line x1="148" y1="84" x2="158" y2="84" stroke="#A7F3D0" stroke-width="0.5"/></g>
+                <g><rect x="160" y="62" width="10" height="17" rx="1.5" fill="#F0FDF4" stroke="#6EE7B7" stroke-width="0.7"/><rect x="161" y="79" width="8" height="13" rx="2.5" fill="#F0FDF4" stroke="#6EE7B7" stroke-width="0.7"/><line x1="165" y1="79" x2="165" y2="92" stroke="#A7F3D0" stroke-width="0.5"/><line x1="161" y1="84" x2="171" y2="84" stroke="#A7F3D0" stroke-width="0.5"/></g>
+                <g opacity="0.4"><rect x="174" y="62" width="11" height="16" rx="1.5" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="0.5"/><rect x="175" y="78" width="9" height="11" rx="2.5" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="0.5"/><line x1="177" y1="83" x2="183" y2="89" stroke="#D1D5DB" stroke-width="0.6"/><line x1="183" y1="83" x2="177" y2="89" stroke="#D1D5DB" stroke-width="0.6"/></g>
+              </svg>
+              <div class="leg">
+                <div class="li"><div class="ld" style="background:#DCFCE7;border:.5px solid #6EE7B7;"></div>Healthy</div>
+                <div class="li"><div class="ld" style="background:#FEF9C3;border:.5px solid #FCD34D;"></div>Watch</div>
+                <div class="li"><div class="ld" style="background:#FEE2E2;border:.5px solid #FCA5A5;"></div>Problem</div>
+                <div class="li"><div class="ld" style="background:#EFF6FF;border:.5px solid #93C5FD;"></div>Treated</div>
+                <div class="li"><div class="ld" style="background:#F5F3FF;border:.5px solid #C4B5FD;"></div>Implant</div>
+              </div>
+            </div>
+
+            <div class="teeth-detail-card">
+              <div class="tdc-header">
+                <div class="tdc-num" style="background:#FEF2F2;color:#B91C1C;">11</div>
+                <div>
+                  <div class="tdc-name">Upper left central incisor</div>
+                  <div class="tdc-status" style="background:#FEF2F2;color:#B91C1C;"><div style="width:5px;height:5px;border-radius:99px;background:#EF4444;"></div>Root canal in progress</div>
+                  <div class="tdc-doc">Dr. Kovalenko · Updated Mar 3</div>
+                </div>
+              </div>
+              <div class="pb-wrap">
+                <div class="pb-lbl">Treatment progress · Step 3 of 5</div>
+                <div class="pb-steps">
+                  <div class="pb-step pb-done"></div><div class="pb-step pb-done"></div><div class="pb-step pb-curr"></div><div class="pb-step pb-next"></div><div class="pb-step pb-next"></div>
+                </div>
+                <div class="pb-names">
+                  <div class="pb-n on">Diagnosis</div><div class="pb-n on">Cleaning</div><div class="pb-n on">Filling</div><div class="pb-n">Crown</div><div class="pb-n">Done</div>
+                </div>
+              </div>
+              <div class="tl-wrap">
+                <div class="tl-section-lbl">History</div>
+                <div class="tl-item">
+                  <div class="tl-left"><div class="tl-dot" style="background:#0EA5B5;"></div><div class="tl-line"></div></div>
+                  <div style="flex:1;padding-bottom:10px;">
+                    <div class="tl-date">Mar 3, 2025 · Dr. Kovalenko</div>
+                    <div class="tl-title">Canal filling — temporary</div>
+                    <div class="tl-sub">Temp filling placed. Next: permanent in 2 weeks.</div>
+                  </div>
+                </div>
+                <div class="tl-item">
+                  <div class="tl-left"><div class="tl-dot" style="background:#0EA5B5;"></div><div class="tl-line"></div></div>
+                  <div style="flex:1;padding-bottom:10px;">
+                    <div class="tl-date">Feb 18, 2025 · Dr. Kovalenko</div>
+                    <div class="tl-title">Canal cleaning</div>
+                    <div class="tl-sub">Mechanical & chemical treatment. 2 photos attached.</div>
+                  </div>
+                </div>
+                <div class="tl-item" style="padding-bottom:0;">
+                  <div class="tl-left"><div class="tl-dot" style="background:#D1D5DB;"></div></div>
+                  <div style="flex:1;">
+                    <div class="tl-date">Feb 5, 2025 · Dr. Kovalenko</div>
+                    <div class="tl-title">Diagnosis · X-ray</div>
+                    <div class="tl-sub">Deep caries, root canal recommended.</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="nb">
+            <div class="ni" onclick="goToFamily()"><svg width="15" height="15" viewBox="0 0 16 16" fill="none"><circle cx="5.5" cy="5" r="2.2" stroke="#C4C9D0" stroke-width="1.2"/><circle cx="11" cy="5.5" r="1.8" stroke="#C4C9D0" stroke-width="1.2"/><path d="M1.5 13c0-2 1.8-3.5 4-3.5s4 1.5 4 3.5" stroke="#C4C9D0" stroke-width="1.2" stroke-linecap="round"/><path d="M11 10c1.5.3 2.8 1.5 2.8 3" stroke="#C4C9D0" stroke-width="1.2" stroke-linecap="round"/></svg><div class="nl">Family</div></div>
+            <div class="ni"><svg width="15" height="15" viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="5" height="5" rx="1.5" fill="#0EA5B5"/><rect x="9" y="2" width="5" height="5" rx="1.5" fill="#0EA5B5" opacity=".35"/><rect x="2" y="9" width="5" height="5" rx="1.5" fill="#0EA5B5" opacity=".35"/><rect x="9" y="9" width="5" height="5" rx="1.5" fill="#0EA5B5" opacity=".35"/></svg><div class="nl on">Home</div><div class="ni-dot"></div></div>
+            <div class="ni" onclick="goToProfile()"><svg width="15" height="15" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="6" r="2.8" stroke="#C4C9D0" stroke-width="1.2"/><path d="M2.5 14c0-3 2.5-5 5.5-5s5.5 2 5.5 5" stroke="#C4C9D0" stroke-width="1.2" stroke-linecap="round"/></svg><div class="nl">Profile</div></div>
+          </div>
+        </div>
+
+        <!-- FAMILY PAGE -->
+        <div class="page" id="page-family">
+          <div class="sbar"><span class="sbar-t">9:41</span></div>
+          <div class="scr">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;padding-top:4px;">
+              <div style="font-size:18px;font-weight:700;color:#1A1F2E;letter-spacing:-0.5px;">Family</div>
+              <div style="width:28px;height:28px;border-radius:99px;background:#F0FDFA;border:.5px solid #0EA5B5;display:flex;align-items:center;justify-content:center;font-size:15px;color:#0EA5B5;cursor:pointer;">+</div>
+            </div>
+            <div class="fam-card">
+              <div class="fam-ava" style="background:#CFFAFE;color:#0E7490;">ОК</div>
+              <div><div class="fam-name">Олексій</div><div class="fam-role">You · Adult</div></div>
+              <div class="fam-score-wrap"><div class="fam-score" style="color:#1A1F2E;">78</div><div class="fam-bar-bg"><div class="fam-bar-f" style="width:78%;background:#0EA5B5;"></div></div><div class="fam-lbl">health score</div></div>
+            </div>
+            <div class="fam-card">
+              <div class="fam-ava" style="background:#FEF9C3;color:#A16207;">МК</div>
+              <div><div class="fam-name">Марія</div><div class="fam-role">Partner · Adult</div></div>
+              <div class="fam-score-wrap"><div class="fam-score" style="color:#1A1F2E;">91</div><div class="fam-bar-bg"><div class="fam-bar-f" style="width:91%;background:#4ADE80;"></div></div><div class="fam-lbl">health score</div></div>
+            </div>
+            <div class="fam-card" style="border-color:#C4B5FD;">
+              <div class="fam-ava" style="background:#F5F3FF;color:#7C3AED;font-size:19px;">🦸</div>
+              <div><div class="fam-name">Дашенька</div><div style="display:flex;align-items:center;gap:4px;margin-top:2px;"><div class="fam-role">Child · 7 yrs</div><div style="font-size:8px;background:#F5F3FF;color:#7C3AED;padding:1px 6px;border-radius:99px;">Kids</div></div></div>
+              <div class="fam-score-wrap"><div class="fam-score" style="color:#7C3AED;font-size:14px;">⭐ 24</div><div class="fam-lbl" style="color:#C4B5FD;">stars earned</div></div>
+            </div>
+            <div style="background:#fff;border-radius:12px;border:.5px dashed #D1D5DB;padding:12px;display:flex;align-items:center;gap:8px;margin-top:2px;cursor:pointer;">
+              <div style="width:28px;height:28px;border-radius:99px;background:#F3F4F6;display:flex;align-items:center;justify-content:center;font-size:14px;color:#9CA3AF;">+</div>
+              <div style="font-size:10px;color:#9CA3AF;">Add family member</div>
+            </div>
+          </div>
+          <div class="nb">
+            <div class="ni"><svg width="15" height="15" viewBox="0 0 16 16" fill="none"><circle cx="5.5" cy="5" r="2.2" stroke="#0EA5B5" stroke-width="1.2"/><circle cx="11" cy="5.5" r="1.8" stroke="#0EA5B5" stroke-width="1.2"/><path d="M1.5 13c0-2 1.8-3.5 4-3.5s4 1.5 4 3.5" stroke="#0EA5B5" stroke-width="1.2" stroke-linecap="round"/><path d="M11 10c1.5.3 2.8 1.5 2.8 3" stroke="#0EA5B5" stroke-width="1.2" stroke-linecap="round"/></svg><div class="nl on">Family</div><div class="ni-dot"></div></div>
+            <div class="ni" onclick="goHome()"><svg width="15" height="15" viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="5" height="5" rx="1.5" fill="#C4C9D0" opacity=".6"/><rect x="9" y="2" width="5" height="5" rx="1.5" fill="#C4C9D0" opacity=".6"/><rect x="2" y="9" width="5" height="5" rx="1.5" fill="#C4C9D0" opacity=".6"/><rect x="9" y="9" width="5" height="5" rx="1.5" fill="#C4C9D0" opacity=".6"/></svg><div class="nl">Home</div></div>
+            <div class="ni" onclick="goToProfile()"><svg width="15" height="15" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="6" r="2.8" stroke="#C4C9D0" stroke-width="1.2"/><path d="M2.5 14c0-3 2.5-5 5.5-5s5.5 2 5.5 5" stroke="#C4C9D0" stroke-width="1.2" stroke-linecap="round"/></svg><div class="nl">Profile</div></div>
+          </div>
+        </div>
+
+        <!-- PROFILE PAGE -->
+        <div class="page" id="page-profile">
+          <div class="sbar"><span class="sbar-t">9:41</span></div>
+          <div class="scr">
+            <div class="prof-ava-row">
+              <div class="prof-ava">ОК</div>
+              <div><div class="prof-name">Олексій Коваль</div><div class="prof-sub">Member since Jan 2025</div></div>
+            </div>
+            <div class="section-card">
+              <div class="sc-title">My doctors</div>
+              <div class="sc-row"><div class="sc-ic" style="background:#F0FDFA;">🦷</div><div><div class="sc-bname">Dr. Kovalenko</div><div class="sc-bsub">Dentist · Connected</div></div><div class="sc-badge" style="background:#F0FDFA;color:#0C7A87;margin-left:auto;">Active</div><div class="sc-arr">›</div></div>
+              <div class="sc-row"><div class="sc-ic" style="background:#F5F3FF;">📐</div><div><div class="sc-bname">Dr. Melnyk</div><div class="sc-bsub">Orthodontist · Connected</div></div><div class="sc-badge" style="background:#F5F3FF;color:#7C3AED;margin-left:auto;">Ortho</div><div class="sc-arr">›</div></div>
+              <div class="sc-row"><div class="sc-ic" style="background:#F8FAFB;border:.5px dashed #D1D5DB;color:#9CA3AF;font-size:16px;">+</div><div><div class="sc-bname" style="color:#9CA3AF;">Add doctor by code</div></div></div>
+            </div>
+            <div class="section-card">
+              <div class="sc-title">AI scan</div>
+              <div class="sc-row" onclick="goToScan()"><div class="sc-ic" style="background:#FFF7ED;">🤖</div><div><div class="sc-bname">AI hygiene check</div><div class="sc-bsub">Last: 82/100 · 2 days ago</div></div><div class="sc-badge" style="background:#FFF7ED;color:#B45309;margin-left:auto;">82/100</div><div class="sc-arr">›</div></div>
+            </div>
+            <div class="section-card">
+              <div class="sc-title">Settings</div>
+              <div class="sc-row"><div class="sc-ic" style="background:#F8FAFB;">🔔</div><div><div class="sc-bname">Notifications</div></div><div class="sc-arr" style="margin-left:auto;">›</div></div>
+              <div class="sc-row"><div class="sc-ic" style="background:#F8FAFB;">🌐</div><div><div class="sc-bname">Language</div><div class="sc-bsub">Ukrainian</div></div><div class="sc-arr" style="margin-left:auto;">›</div></div>
+            </div>
+          </div>
+          <div class="nb">
+            <div class="ni" onclick="goToFamily()"><svg width="15" height="15" viewBox="0 0 16 16" fill="none"><circle cx="5.5" cy="5" r="2.2" stroke="#C4C9D0" stroke-width="1.2"/><circle cx="11" cy="5.5" r="1.8" stroke="#C4C9D0" stroke-width="1.2"/><path d="M1.5 13c0-2 1.8-3.5 4-3.5s4 1.5 4 3.5" stroke="#C4C9D0" stroke-width="1.2" stroke-linecap="round"/><path d="M11 10c1.5.3 2.8 1.5 2.8 3" stroke="#C4C9D0" stroke-width="1.2" stroke-linecap="round"/></svg><div class="nl">Family</div></div>
+            <div class="ni" onclick="goHome()"><svg width="15" height="15" viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="5" height="5" rx="1.5" fill="#C4C9D0" opacity=".6"/><rect x="9" y="2" width="5" height="5" rx="1.5" fill="#C4C9D0" opacity=".6"/><rect x="2" y="9" width="5" height="5" rx="1.5" fill="#C4C9D0" opacity=".6"/><rect x="9" y="9" width="5" height="5" rx="1.5" fill="#C4C9D0" opacity=".6"/></svg><div class="nl">Home</div></div>
+            <div class="ni"><svg width="15" height="15" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="6" r="2.8" stroke="#0EA5B5" stroke-width="1.2"/><path d="M2.5 14c0-3 2.5-5 5.5-5s5.5 2 5.5 5" stroke="#0EA5B5" stroke-width="1.2" stroke-linecap="round"/></svg><div class="nl on">Profile</div><div class="ni-dot"></div></div>
+          </div>
+        </div>
+
+        <!-- AI SCAN PAGE -->
+        <div class="page" id="page-scan">
+          <div class="sbar"><span class="sbar-t">9:41</span></div>
+          <div class="scr">
+            <div class="screen-header">
+              <div class="back-btn" onclick="goBack()">‹</div>
+              <div class="screen-title">AI hygiene scan</div>
+            </div>
+            <div style="background:#0EA5B5;border-radius:18px;padding:20px;margin-bottom:12px;text-align:center;">
+              <div style="font-size:10px;color:rgba(255,255,255,.7);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;">Last hygiene score</div>
+              <div style="font-size:52px;font-weight:700;color:#fff;letter-spacing:-2px;line-height:1;">82</div>
+              <div style="font-size:13px;color:rgba(255,255,255,.6);margin-bottom:12px;">/100 · 2 days ago</div>
+              <div style="background:rgba(255,255,255,.95);border-radius:12px;padding:12px;display:flex;align-items:center;gap:10px;cursor:pointer;">
+                <div style="width:36px;height:36px;border-radius:10px;background:#0EA5B5;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">📷</div>
+                <div style="text-align:left;">
+                  <div style="font-size:12px;font-weight:600;color:#0C7A87;">Take new scan</div>
+                  <div style="font-size:9px;color:#5BA8B0;margin-top:1px;">Point camera at your teeth</div>
+                </div>
+                <div style="margin-left:auto;font-size:12px;font-weight:600;color:#0EA5B5;background:#E0F9F9;padding:4px 10px;border-radius:99px;">Scan</div>
+              </div>
+            </div>
+            <div style="background:#fff;border-radius:14px;border:.5px solid #E5E8EC;padding:13px;margin-bottom:10px;">
+              <div style="font-size:10px;font-weight:600;color:#9CA3AF;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;">Score history</div>
+              <div style="display:flex;align-items:flex-end;gap:5px;height:60px;margin-bottom:6px;">
+                <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;"><div style="width:100%;background:#E0F2FE;border-radius:3px;" class="bar-col" data-h="65"></div><div style="font-size:7.5px;color:#9CA3AF;">Jan</div></div>
+                <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;"><div style="width:100%;background:#BAE6FD;border-radius:3px;" class="bar-col" data-h="72"></div><div style="font-size:7.5px;color:#9CA3AF;">Feb</div></div>
+                <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;"><div style="width:100%;background:#0EA5B5;border-radius:3px;" class="bar-col" data-h="82"></div><div style="font-size:7.5px;color:#0EA5B5;font-weight:600;">Mar</div></div>
+              </div>
+            </div>
+            <div style="background:#fff;border-radius:14px;border:.5px solid #E5E8EC;overflow:hidden;">
+              <div style="font-size:10px;font-weight:600;color:#9CA3AF;text-transform:uppercase;letter-spacing:.06em;padding:10px 13px 5px;">Last scan findings</div>
+              <div style="display:flex;align-items:center;gap:9px;padding:8px 13px;border-bottom:.5px solid #F3F4F6;"><div style="width:8px;height:8px;border-radius:99px;background:#4ADE80;flex-shrink:0;"></div><div style="font-size:10.5px;color:#1A1F2E;">Plaque level — low</div></div>
+              <div style="display:flex;align-items:center;gap:9px;padding:8px 13px;border-bottom:.5px solid #F3F4F6;"><div style="width:8px;height:8px;border-radius:99px;background:#FCD34D;flex-shrink:0;"></div><div style="font-size:10.5px;color:#1A1F2E;">Gum area — needs attention</div></div>
+              <div style="display:flex;align-items:center;gap:9px;padding:8px 13px;"><div style="width:8px;height:8px;border-radius:99px;background:#4ADE80;flex-shrink:0;"></div><div style="font-size:10.5px;color:#1A1F2E;">Overall cleanliness — good</div></div>
+            </div>
+          </div>
+          <div class="nb">
+            <div class="ni" onclick="goToFamily()"><svg width="15" height="15" viewBox="0 0 16 16" fill="none"><circle cx="5.5" cy="5" r="2.2" stroke="#C4C9D0" stroke-width="1.2"/><circle cx="11" cy="5.5" r="1.8" stroke="#C4C9D0" stroke-width="1.2"/><path d="M1.5 13c0-2 1.8-3.5 4-3.5s4 1.5 4 3.5" stroke="#C4C9D0" stroke-width="1.2" stroke-linecap="round"/><path d="M11 10c1.5.3 2.8 1.5 2.8 3" stroke="#C4C9D0" stroke-width="1.2" stroke-linecap="round"/></svg><div class="nl">Family</div></div>
+            <div class="ni" onclick="goHome()"><svg width="15" height="15" viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="5" height="5" rx="1.5" fill="#C4C9D0" opacity=".6"/><rect x="9" y="2" width="5" height="5" rx="1.5" fill="#C4C9D0" opacity=".6"/><rect x="2" y="9" width="5" height="5" rx="1.5" fill="#C4C9D0" opacity=".6"/><rect x="9" y="9" width="5" height="5" rx="1.5" fill="#C4C9D0" opacity=".6"/></svg><div class="nl">Home</div></div>
+            <div class="ni" onclick="goToProfile()"><svg width="15" height="15" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="6" r="2.8" stroke="#C4C9D0" stroke-width="1.2"/><path d="M2.5 14c0-3 2.5-5 5.5-5s5.5 2 5.5 5" stroke="#C4C9D0" stroke-width="1.2" stroke-linecap="round"/></svg><div class="nl">Profile</div></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="tab-indicator">
+      <div class="tab-dot" id="dot-family" onclick="goToFamily()"></div>
+      <div class="tab-dot on" id="dot-home" onclick="goHome()"></div>
+      <div class="tab-dot" id="dot-profile" onclick="goToProfile()"></div>
+    </div>
+    <div class="tab-names">
+      <div class="tab-name" id="tn-family" onclick="goToFamily()">Family</div>
+      <div class="tab-name on" id="tn-home" onclick="goHome()">Home</div>
+      <div class="tab-name" id="tn-profile" onclick="goToProfile()">Profile</div>
+    </div>
+  </div>
+</div>
+
+<script>
+let history = [];
+let current = 'home';
+
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  document.getElementById('page-' + id).querySelector('.scr') && (document.getElementById('page-' + id).querySelector('.scr').scrollTop = 0);
+  current = id;
+  updateDots(id);
+}
+
+function updateDots(id) {
+  const tabs = ['family','home','profile'];
+  const dotIds = ['dot-family','dot-home','dot-profile'];
+  const tnIds = ['tn-family','tn-home','tn-profile'];
+  const mapped = id === 'teeth' || id === 'scan' ? 'home' : id;
+  dotIds.forEach((d,i) => {
+    document.getElementById(d).className = 'tab-dot' + (tabs[i] === mapped ? ' on' : '');
+    document.getElementById(tnIds[i]).className = 'tab-name' + (tabs[i] === mapped ? ' on' : '');
+  });
+}
+
+function navigate(id) {
+  history.push(current);
+  showPage(id);
+}
+
+function goHome() { history = []; showPage('home'); }
+function goToTeeth() { navigate('teeth'); }
+function goToFamily() { history = []; showPage('family'); }
+function goToProfile() { history = []; showPage('profile'); }
+function goToScan() { navigate('scan'); }
+function goBack() {
+  const prev = history.pop();
+  if (prev) showPage(prev);
+  else showPage('home');
+}
+
+document.querySelectorAll('.bar-col').forEach(el => {
+  const h = parseInt(el.dataset.h);
+  el.style.height = (h * 0.55) + 'px';
+});
+</script>
